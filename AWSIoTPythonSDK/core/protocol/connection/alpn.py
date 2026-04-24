@@ -27,37 +27,25 @@ class SSLContextBuilder(object):
         self._ssl_context = ssl.create_default_context()
 
     def check_supportability(self):
-        if ssl is None:
-            raise RuntimeError("This platform has no SSL/TLS.")
-        if not hasattr(ssl, "SSLContext"):
-            raise NotImplementedError("This platform does not support SSLContext. Python 2.7.10+/3.5+ is required.")
-        if not hasattr(ssl.SSLContext, "set_alpn_protocols"):
-            raise NotImplementedError("This platform does not support ALPN as TLS extensions. Python 2.7.10+/3.5+ is required.")
+        pass
 
     def with_ca_certs(self, ca_certs):
-        self._ssl_context.load_verify_locations(ca_certs)
-        return self
+        pass
 
     def with_cert_key_pair(self, cert_file, key_file):
-        self._ssl_context.load_cert_chain(cert_file, key_file)
-        return self
+        pass
 
     def with_cert_reqs(self, cert_reqs):
-        self._ssl_context.verify_mode = cert_reqs
-        return self
+        pass
 
     def with_check_hostname(self, check_hostname):
-        self._ssl_context.check_hostname = check_hostname
-        return self
+        pass
 
     def with_ciphers(self, ciphers):
-        if ciphers is not None:
-            self._ssl_context.set_ciphers(ciphers)  # set_ciphers() does not allow None input. Use default (do nothing) if None
-        return self
+        pass
 
     def with_alpn_protocols(self, alpn_protocols):
-        self._ssl_context.set_alpn_protocols(alpn_protocols)
-        return self
+        pass
 
     def build(self):
-        return self._ssl_context
+        pass

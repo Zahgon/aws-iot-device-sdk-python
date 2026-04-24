@@ -72,14 +72,10 @@ class jobExecutionStatus(object):
     JOB_EXECUTION_UNKNOWN_STATUS = (99, None)
 
 def _getExecutionStatus(jobStatus):
-    try:
-        return jobStatus[_JOB_STATUS_INDEX]
-    except KeyError:
-        return None
+    pass
 
 def _isWithoutJobIdTopicType(srcJobExecTopicType):
-    return (srcJobExecTopicType == jobExecutionTopicType.JOB_GET_PENDING_TOPIC or srcJobExecTopicType == jobExecutionTopicType.JOB_START_NEXT_TOPIC
-            or srcJobExecTopicType == jobExecutionTopicType.JOB_NOTIFY_TOPIC or srcJobExecTopicType == jobExecutionTopicType.JOB_NOTIFY_NEXT_TOPIC)
+    pass
 
 class thingJobManager:
     def __init__(self, thingName, clientToken = None):
@@ -87,70 +83,16 @@ class thingJobManager:
         self._clientToken = clientToken
 
     def getJobTopic(self, srcJobExecTopicType, srcJobExecTopicReplyType=jobExecutionTopicReplyType.JOB_REQUEST_TYPE, jobId=None):
-        if self._thingName is None:
-            return None
-
-        #Verify topics that only support request type, actually have request type specified for reply
-        if (srcJobExecTopicType == jobExecutionTopicType.JOB_NOTIFY_TOPIC or srcJobExecTopicType == jobExecutionTopicType.JOB_NOTIFY_NEXT_TOPIC) and srcJobExecTopicReplyType != jobExecutionTopicReplyType.JOB_REQUEST_TYPE:
-            return None
-
-        #Verify topics that explicitly do not want a job ID do not have one specified
-        if (jobId is not None and _isWithoutJobIdTopicType(srcJobExecTopicType)):
-            return None
-
-        #Verify job ID is present if the topic requires one
-        if jobId is None and srcJobExecTopicType[_JOB_ID_REQUIRED_INDEX]:
-            return None
-
-        #Ensure the job operation is a non-empty string
-        if srcJobExecTopicType[_JOB_OPERATION_INDEX] == '':
-            return None
-
-        if srcJobExecTopicType[_JOB_ID_REQUIRED_INDEX]:
-            return '{0}{1}/jobs/{2}/{3}{4}'.format(_BASE_THINGS_TOPIC, self._thingName, str(jobId), srcJobExecTopicType[_JOB_OPERATION_INDEX], srcJobExecTopicReplyType[_JOB_SUFFIX_INDEX])
-        elif srcJobExecTopicType == jobExecutionTopicType.JOB_WILDCARD_TOPIC:
-            return '{0}{1}/jobs/#'.format(_BASE_THINGS_TOPIC, self._thingName)
-        else:
-            return '{0}{1}/jobs/{2}{3}'.format(_BASE_THINGS_TOPIC, self._thingName, srcJobExecTopicType[_JOB_OPERATION_INDEX], srcJobExecTopicReplyType[_JOB_SUFFIX_INDEX])
+        pass
 
     def serializeJobExecutionUpdatePayload(self, status, statusDetails=None, expectedVersion=0, executionNumber=0, includeJobExecutionState=False, includeJobDocument=False, stepTimeoutInMinutes=None):
-        executionStatus = _getExecutionStatus(status)
-        if executionStatus is None:
-            return None
-        payload = {_STATUS_KEY: executionStatus}
-        if statusDetails:
-            payload[_STATUS_DETAILS_KEY] = statusDetails
-        if expectedVersion > 0:
-            payload[_EXPECTED_VERSION_KEY] = str(expectedVersion)
-        if executionNumber > 0:
-            payload[_EXEXCUTION_NUMBER_KEY] = str(executionNumber)
-        if includeJobExecutionState:
-            payload[_INCLUDE_JOB_EXECUTION_STATE_KEY] = True
-        if includeJobDocument:
-            payload[_INCLUDE_JOB_DOCUMENT_KEY] = True
-        if self._clientToken is not None:
-            payload[_CLIENT_TOKEN_KEY] = self._clientToken
-        if stepTimeoutInMinutes is not None:
-            payload[_STEP_TIMEOUT_IN_MINUTES_KEY] = stepTimeoutInMinutes
-        return json.dumps(payload)
+        pass
 
     def serializeDescribeJobExecutionPayload(self, executionNumber=0, includeJobDocument=True):
-        payload = {_INCLUDE_JOB_DOCUMENT_KEY: includeJobDocument}
-        if executionNumber > 0:
-            payload[_EXEXCUTION_NUMBER_KEY] = executionNumber
-        if self._clientToken is not None:
-            payload[_CLIENT_TOKEN_KEY] = self._clientToken
-        return json.dumps(payload)
+        pass
 
     def serializeStartNextPendingJobExecutionPayload(self, statusDetails=None, stepTimeoutInMinutes=None):
-        payload = {}
-        if self._clientToken is not None:
-            payload[_CLIENT_TOKEN_KEY] = self._clientToken
-        if statusDetails is not None:
-            payload[_STATUS_DETAILS_KEY] = statusDetails
-        if stepTimeoutInMinutes is not None:
-            payload[_STEP_TIMEOUT_IN_MINUTES_KEY] = stepTimeoutInMinutes
-        return json.dumps(payload)
+        pass
 
     def serializeClientTokenPayload(self):
-        return json.dumps({_CLIENT_TOKEN_KEY: self._clientToken}) if self._clientToken is not None else '{}'
+        pass

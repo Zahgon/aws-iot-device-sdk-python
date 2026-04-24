@@ -50,7 +50,7 @@ class ConnectivityInfo(object):
         Connectivity Information Id.
 
         """
-        return self._id
+        pass
 
     @property
     def host(self):
@@ -59,7 +59,7 @@ class ConnectivityInfo(object):
         Host address.
 
         """
-        return self._host
+        pass
 
     @property
     def port(self):
@@ -68,7 +68,7 @@ class ConnectivityInfo(object):
         Port number.
 
         """
-        return self._port
+        pass
 
     @property
     def metadata(self):
@@ -77,7 +77,7 @@ class ConnectivityInfo(object):
         Metadata string.
 
         """
-        return self._metadata
+        pass
 
 
 class CoreConnectivityInfo(object):
@@ -101,7 +101,7 @@ class CoreConnectivityInfo(object):
         Thing arn for this Greengrass core.
 
         """
-        return self._core_thing_arn
+        pass
 
     @property
     def groupId(self):
@@ -110,7 +110,7 @@ class CoreConnectivityInfo(object):
         Greengrass group id that this Greengrass core belongs to.
 
         """
-        return self._group_id
+        pass
 
     @property
     def connectivityInfoList(self):
@@ -119,7 +119,7 @@ class CoreConnectivityInfo(object):
         The list of connectivity information that this Greengrass core has.
 
         """
-        return list(self._connectivity_info_dict.values())
+        pass
 
     def getConnectivityInfo(self, id):
         """
@@ -143,7 +143,7 @@ class CoreConnectivityInfo(object):
         :code:`AWSIoTPythonSDK.core.greengrass.discovery.models.ConnectivityInfo` object.
 
         """
-        return self._connectivity_info_dict.get(id)
+        pass
 
     def appendConnectivityInfo(self, connectivityInfo):
         """
@@ -168,7 +168,7 @@ class CoreConnectivityInfo(object):
         None
 
         """
-        self._connectivity_info_dict[connectivityInfo.id] = connectivityInfo
+        pass
 
 
 class GroupConnectivityInfo(object):
@@ -191,7 +191,7 @@ class GroupConnectivityInfo(object):
         Id for this Greengrass group.
 
         """
-        return self._group_id
+        pass
 
     @property
     def coreConnectivityInfoList(self):
@@ -202,7 +202,7 @@ class GroupConnectivityInfo(object):
         Greengrass group.
 
         """
-        return list(self._core_connectivity_info_dict.values())
+        pass
 
     @property
     def caList(self):
@@ -211,7 +211,7 @@ class GroupConnectivityInfo(object):
         A list of CA content strings for this Greengrass group.
 
         """
-        return self._ca_list
+        pass
 
     def getCoreConnectivityInfo(self, coreThingArn):
         """
@@ -236,7 +236,7 @@ class GroupConnectivityInfo(object):
         :code:`AWSIoTPythonSDK.core.greengrass.discovery.CoreConnectivityInfo` object.
 
         """
-        return self._core_connectivity_info_dict.get(coreThingArn)
+        pass
 
     def appendCoreConnectivityInfo(self, coreConnectivityInfo):
         """
@@ -261,7 +261,7 @@ class GroupConnectivityInfo(object):
         None
 
         """
-        self._core_connectivity_info_dict[coreConnectivityInfo.coreThingArn] = coreConnectivityInfo
+        pass
 
     def appendCa(self, ca):
         """
@@ -286,7 +286,7 @@ class GroupConnectivityInfo(object):
         None
 
         """
-        self._ca_list.append(ca)
+        pass
 
 
 class DiscoveryInfo(object):
@@ -308,7 +308,7 @@ class DiscoveryInfo(object):
         some process by themselves.
 
         """
-        return self._raw_json
+        pass
 
     def getAllCores(self):
         """
@@ -335,13 +335,7 @@ class DiscoveryInfo(object):
         List of :code:`AWSIoTPythonSDK.core.greengrass.discovery.models.CoreConnectivtyInfo` object.
 
         """
-        groups_list = self.getAllGroups()
-        core_list = list()
-
-        for group in groups_list:
-            core_list.extend(group.coreConnectivityInfoList)
-
-        return core_list
+        pass
 
     def getAllCas(self):
         """
@@ -368,14 +362,7 @@ class DiscoveryInfo(object):
         :code:`groupId` is the group id that this CA belongs to.
 
         """
-        group_list = self.getAllGroups()
-        ca_list = list()
-
-        for group in group_list:
-            for ca in group.caList:
-                ca_list.append((group.groupId, ca))
-
-        return ca_list
+        pass
 
     def getAllGroups(self):
         """
@@ -401,8 +388,7 @@ class DiscoveryInfo(object):
         List of :code:`AWSIoTPythonSDK.core.greengrass.discovery.models.GroupConnectivityInfo` object.
 
         """
-        groups_dict = self.toObjectAtGroupLevel()
-        return list(groups_dict.values())
+        pass
 
     def toObjectAtGroupLevel(self):
         """
@@ -431,36 +417,10 @@ class DiscoveryInfo(object):
           # Actual connecting logic follows...
 
         """
-        groups_object = json.loads(self._raw_json)
-        groups_dict = dict()
-
-        for group_object in groups_object[KEY_GROUP_LIST]:
-            group_info = self._decode_group_info(group_object)
-            groups_dict[group_info.groupId] = group_info
-
-        return groups_dict
+        pass
 
     def _decode_group_info(self, group_object):
-        group_id = group_object[KEY_GROUP_ID]
-        group_info = GroupConnectivityInfo(group_id)
-
-        for core in group_object[KEY_CORE_LIST]:
-            core_info = self._decode_core_info(core, group_id)
-            group_info.appendCoreConnectivityInfo(core_info)
-
-        for ca in group_object[KEY_CA_LIST]:
-            group_info.appendCa(ca)
-
-        return group_info
+        pass
 
     def _decode_core_info(self, core_object, group_id):
-        core_info = CoreConnectivityInfo(core_object[KEY_CORE_ARN], group_id)
-
-        for connectivity_info_object in core_object[KEY_CONNECTIVITY_INFO_LIST]:
-            connectivity_info = ConnectivityInfo(connectivity_info_object[KEY_CONNECTIVITY_INFO_ID],
-                                                 connectivity_info_object[KEY_HOST_ADDRESS],
-                                                 connectivity_info_object[KEY_PORT_NUMBER],
-                                                 connectivity_info_object.get(KEY_METADATA,''))
-            core_info.appendConnectivityInfo(connectivity_info)
-
-        return core_info
+        pass

@@ -24,38 +24,29 @@ class _shadowRequestToken:
     URN_PREFIX_LENGTH = 9
 
     def getNextToken(self):
-        return uuid.uuid4().urn[self.URN_PREFIX_LENGTH:]  # We only need the uuid digits, not the urn prefix
+        pass
 
 
 def _validateJSON(jsonString):
-    try:
-        json.loads(jsonString)
-    except ValueError:
-        return False
-    return True
+    pass
 
 
 class _basicJSONParser:
 
     def setString(self, srcString):
-        self._rawString = srcString
-        self._dictionObject = None
+        pass
 
     def regenerateString(self):
-        return json.dumps(self._dictionaryObject)
+        pass
 
     def getAttributeValue(self, srcAttributeKey):
-        return self._dictionaryObject.get(srcAttributeKey)
+        pass
 
     def setAttributeValue(self, srcAttributeKey, srcAttributeValue):
-        self._dictionaryObject[srcAttributeKey] = srcAttributeValue
+        pass
 
     def validateJSON(self):
-        try:
-            self._dictionaryObject = json.loads(self._rawString)
-        except ValueError:
-            return False
-        return True
+        pass
 
 
 class deviceShadow:
@@ -110,97 +101,24 @@ class deviceShadow:
         self._dataStructureLock = Lock()
 
     def _doNonPersistentUnsubscribe(self, currentAction):
-        self._shadowManagerHandler.basicShadowUnsubscribe(self._shadowName, currentAction)
-        self._logger.info("Unsubscribed to " + currentAction + " accepted/rejected topics for deviceShadow: " + self._shadowName)
+        pass
 
     def generalCallback(self, client, userdata, message):
         # In Py3.x, message.payload comes in as a bytes(string)
         # json.loads needs a string input
-        with self._dataStructureLock:
-            currentTopic = message.topic
-            currentAction = self._parseTopicAction(currentTopic)  # get/delete/update/delta
-            currentType = self._parseTopicType(currentTopic)  # accepted/rejected/delta
-            payloadUTF8String = message.payload.decode('utf-8')
-            # get/delete/update: Need to deal with token, timer and unsubscribe
-            if currentAction in ["get", "delete", "update"]:
-                # Check for token
-                self._basicJSONParserHandler.setString(payloadUTF8String)
-                if self._basicJSONParserHandler.validateJSON():  # Filter out invalid JSON
-                    currentToken = self._basicJSONParserHandler.getAttributeValue(u"clientToken")
-                    if currentToken is not None:
-                        self._logger.debug("shadow message clientToken: " + currentToken)
-                    if currentToken is not None and currentToken in self._tokenPool.keys():  # Filter out JSON without the desired token
-                        # Sync local version when it is an accepted response
-                        self._logger.debug("Token is in the pool. Type: " + currentType)
-                        if currentType == "accepted":
-                            incomingVersion = self._basicJSONParserHandler.getAttributeValue(u"version")
-                            # If it is get/update accepted response, we need to sync the local version
-                            if incomingVersion is not None and incomingVersion > self._lastVersionInSync and currentAction != "delete":
-                                self._lastVersionInSync = incomingVersion
-                            # If it is a delete accepted, we need to reset the version
-                            else:
-                                self._lastVersionInSync = -1  # The version will always be synced for the next incoming delta/GU-accepted response
-                        # Cancel the timer and clear the token
-                        self._tokenPool[currentToken].cancel()
-                        del self._tokenPool[currentToken]
-                        # Need to unsubscribe?
-                        self._shadowSubscribeStatusTable[currentAction] -= 1
-                        if not self._isPersistentSubscribe and self._shadowSubscribeStatusTable.get(currentAction) <= 0:
-                            self._shadowSubscribeStatusTable[currentAction] = 0
-                            processNonPersistentUnsubscribe = Thread(target=self._doNonPersistentUnsubscribe, args=[currentAction])
-                            processNonPersistentUnsubscribe.start()
-                        # Custom callback
-                        if self._shadowSubscribeCallbackTable.get(currentAction) is not None:
-                            processCustomCallback = Thread(target=self._shadowSubscribeCallbackTable[currentAction], args=[payloadUTF8String, currentType, currentToken])
-                            processCustomCallback.start()
-            # delta: Watch for version
-            else:
-                currentType += "/" + self._parseTopicShadowName(currentTopic)
-                # Sync local version
-                self._basicJSONParserHandler.setString(payloadUTF8String)
-                if self._basicJSONParserHandler.validateJSON():  # Filter out JSON without version
-                    incomingVersion = self._basicJSONParserHandler.getAttributeValue(u"version")
-                    if incomingVersion is not None and incomingVersion > self._lastVersionInSync:
-                        self._lastVersionInSync = incomingVersion
-                        # Custom callback
-                        if self._shadowSubscribeCallbackTable.get(currentAction) is not None:
-                            processCustomCallback = Thread(target=self._shadowSubscribeCallbackTable[currentAction], args=[payloadUTF8String, currentType, None])
-                            processCustomCallback.start()
+        pass
 
     def _parseTopicAction(self, srcTopic):
-        ret = None
-        fragments = srcTopic.split('/')
-        if fragments[5] == "delta":
-            ret = "delta"
-        else:
-            ret = fragments[4]
-        return ret
+        pass
 
     def _parseTopicType(self, srcTopic):
-        fragments = srcTopic.split('/')
-        return fragments[5]
+        pass
 
     def _parseTopicShadowName(self, srcTopic):
-        fragments = srcTopic.split('/')
-        return fragments[2]
+        pass
 
     def _timerHandler(self, srcActionName, srcToken):
-        with self._dataStructureLock:
-            # Don't crash if we try to remove an unknown token
-            if srcToken not in self._tokenPool:
-                self._logger.warn('Tried to remove non-existent token from pool: %s' % str(srcToken))
-                return
-            # Remove the token
-            del self._tokenPool[srcToken]
-            # Need to unsubscribe?
-            self._shadowSubscribeStatusTable[srcActionName] -= 1
-            if not self._isPersistentSubscribe and self._shadowSubscribeStatusTable.get(srcActionName) <= 0:
-                self._shadowSubscribeStatusTable[srcActionName] = 0
-                self._shadowManagerHandler.basicShadowUnsubscribe(self._shadowName, srcActionName)
-            # Notify time-out issue
-            if self._shadowSubscribeCallbackTable.get(srcActionName) is not None:
-                self._logger.info("Shadow request with token: " + str(srcToken) + " has timed out.")
-                self._shadowSubscribeCallbackTable[srcActionName]("REQUEST TIME OUT", "timeout", srcToken)
+        pass
 
     def shadowGet(self, srcCallback, srcTimeout):
         """
@@ -234,30 +152,7 @@ class deviceShadow:
         The token used for tracing in this shadow request.
 
         """
-        with self._dataStructureLock:
-            # Update callback data structure
-            self._shadowSubscribeCallbackTable["get"] = srcCallback
-            # Update number of pending feedback
-            self._shadowSubscribeStatusTable["get"] += 1
-            # clientToken
-            currentToken = self._tokenHandler.getNextToken()
-            self._tokenPool[currentToken] = Timer(srcTimeout, self._timerHandler, ["get", currentToken])
-            self._basicJSONParserHandler.setString("{}")
-            self._basicJSONParserHandler.validateJSON()
-            self._basicJSONParserHandler.setAttributeValue("clientToken", currentToken)
-            currentPayload = self._basicJSONParserHandler.regenerateString()
-        # Two subscriptions
-        if not self._isPersistentSubscribe or not self._isGetSubscribed:
-            self._shadowManagerHandler.basicShadowSubscribe(self._shadowName, "get", self.generalCallback)
-            self._isGetSubscribed = True
-            self._logger.info("Subscribed to get accepted/rejected topics for deviceShadow: " + self._shadowName)
-        # One publish
-        self._shadowManagerHandler.basicShadowPublish(self._shadowName, "get", currentPayload)
-        # Start the timer
-        with self._dataStructureLock:
-            if currentToken in self._tokenPool:
-                self._tokenPool[currentToken].start()
-        return currentToken
+        pass
 
     def shadowDelete(self, srcCallback, srcTimeout):
         """
@@ -291,30 +186,7 @@ class deviceShadow:
         The token used for tracing in this shadow request.
 
         """
-        with self._dataStructureLock:
-            # Update callback data structure
-            self._shadowSubscribeCallbackTable["delete"] = srcCallback
-            # Update number of pending feedback
-            self._shadowSubscribeStatusTable["delete"] += 1
-            # clientToken
-            currentToken = self._tokenHandler.getNextToken()
-            self._tokenPool[currentToken] = Timer(srcTimeout, self._timerHandler, ["delete", currentToken])
-            self._basicJSONParserHandler.setString("{}")
-            self._basicJSONParserHandler.validateJSON()
-            self._basicJSONParserHandler.setAttributeValue("clientToken", currentToken)
-            currentPayload = self._basicJSONParserHandler.regenerateString()
-        # Two subscriptions
-        if not self._isPersistentSubscribe or not self._isDeleteSubscribed:
-            self._shadowManagerHandler.basicShadowSubscribe(self._shadowName, "delete", self.generalCallback)
-            self._isDeleteSubscribed = True
-            self._logger.info("Subscribed to delete accepted/rejected topics for deviceShadow: " + self._shadowName)
-        # One publish
-        self._shadowManagerHandler.basicShadowPublish(self._shadowName, "delete", currentPayload)
-        # Start the timer
-        with self._dataStructureLock:
-            if currentToken in self._tokenPool:
-                self._tokenPool[currentToken].start()
-        return currentToken
+        pass
 
     def shadowUpdate(self, srcJSONPayload, srcCallback, srcTimeout):
         """
@@ -350,34 +222,7 @@ class deviceShadow:
         The token used for tracing in this shadow request.
 
         """
-        # Validate JSON
-        if _validateJSON(srcJSONPayload):
-            with self._dataStructureLock:
-                self._basicJSONParserHandler.setString(srcJSONPayload)
-                self._basicJSONParserHandler.validateJSON()
-                # clientToken
-                currentToken = self._tokenHandler.getNextToken()
-                self._tokenPool[currentToken] = Timer(srcTimeout, self._timerHandler, ["update", currentToken])
-                self._basicJSONParserHandler.setAttributeValue("clientToken", currentToken)
-                JSONPayloadWithToken = self._basicJSONParserHandler.regenerateString()
-                # Update callback data structure
-                self._shadowSubscribeCallbackTable["update"] = srcCallback
-                # Update number of pending feedback
-                self._shadowSubscribeStatusTable["update"] += 1
-            # Two subscriptions
-            if not self._isPersistentSubscribe or not self._isUpdateSubscribed:
-                self._shadowManagerHandler.basicShadowSubscribe(self._shadowName, "update", self.generalCallback)
-                self._isUpdateSubscribed = True
-                self._logger.info("Subscribed to update accepted/rejected topics for deviceShadow: " + self._shadowName)
-            # One publish
-            self._shadowManagerHandler.basicShadowPublish(self._shadowName, "update", JSONPayloadWithToken)
-            # Start the timer
-            with self._dataStructureLock:
-                if currentToken in self._tokenPool:
-                    self._tokenPool[currentToken].start()
-        else:
-            raise ValueError("Invalid JSON file.")
-        return currentToken
+        pass
 
     def shadowRegisterDeltaCallback(self, srcCallback):
         """
@@ -406,12 +251,7 @@ class deviceShadow:
         None
 
         """
-        with self._dataStructureLock:
-            # Update callback data structure
-            self._shadowSubscribeCallbackTable["delta"] = srcCallback
-        # One subscription
-        self._shadowManagerHandler.basicShadowSubscribe(self._shadowName, "delta", self.generalCallback)
-        self._logger.info("Subscribed to delta topic for deviceShadow: " + self._shadowName)
+        pass
 
     def shadowUnregisterDeltaCallback(self):
         """
@@ -437,9 +277,4 @@ class deviceShadow:
         None
 
         """
-        with self._dataStructureLock:
-            # Update callback data structure
-            del self._shadowSubscribeCallbackTable["delta"]
-        # One unsubscription
-        self._shadowManagerHandler.basicShadowUnsubscribe(self._shadowName, "delta")
-        self._logger.info("Unsubscribed to delta topics for deviceShadow: " + self._shadowName)
+        pass

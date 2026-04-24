@@ -139,8 +139,7 @@ class DiscoveryInfoProvider(object):
         None
 
         """
-        self._host = host
-        self._port = port
+        pass
 
     def configureCredentials(self, caPath, certPath, keyPath):
         """
@@ -168,9 +167,7 @@ class DiscoveryInfoProvider(object):
         None
 
         """
-        self._ca_path = caPath
-        self._cert_path = certPath
-        self._key_path = keyPath
+        pass
 
     def configureTimeout(self, timeoutSec):
         """
@@ -197,7 +194,7 @@ class DiscoveryInfoProvider(object):
         None
 
         """
-        self._timeout_sec = timeoutSec
+        pass
 
     def discover(self, thingName):
         """
@@ -221,222 +218,46 @@ class DiscoveryInfoProvider(object):
         :code:`AWSIoTPythonSDK.core.greengrass.discovery.models.DiscoveryInfo` object.
 
         """
-        self._logger.info("Starting discover request...")
-        self._logger.info("Endpoint: " + self._host + ":" + str(self._port))
-        self._logger.info("Target thing: " + thingName)
-        sock = self._create_tcp_connection()
-        ssl_sock = self._create_ssl_connection(sock)
-        self._raise_on_timeout(self._send_discovery_request(ssl_sock, thingName))
-        status_code, response_body = self._receive_discovery_response(ssl_sock)
-
-        return self._raise_if_not_200(status_code, response_body)
+        pass
 
     def _create_tcp_connection(self):
-        self._logger.debug("Creating tcp connection...")
-        try:
-            if (sys.version_info[0] == 2 and sys.version_info[1] < 7) or (sys.version_info[0] == 3 and sys.version_info[1] < 2):
-                sock = socket.create_connection((self._host, self._port))
-            else:
-                sock = socket.create_connection((self._host, self._port), source_address=("", 0))
-            return sock
-        except socket.error as err:
-            if err.errno != errno.EINPROGRESS and err.errno != errno.EWOULDBLOCK and err.errno != EAGAIN:
-                raise
-        self._logger.debug("Created tcp connection.")
+        pass
 
     def _create_ssl_connection(self, sock):
-        self._logger.debug("Creating ssl connection...")
-
-        ssl_protocol_version = ssl.PROTOCOL_SSLv23
-
-        if self._port == 443:
-            ssl_context = SSLContextBuilder()\
-                .with_ca_certs(self._ca_path)\
-                .with_cert_key_pair(self._cert_path, self._key_path)\
-                .with_cert_reqs(ssl.CERT_REQUIRED)\
-                .with_check_hostname(True)\
-                .with_ciphers(None)\
-                .with_alpn_protocols(['x-amzn-http-ca'])\
-                .build()
-            ssl_sock = ssl_context.wrap_socket(sock, server_hostname=self._host, do_handshake_on_connect=False)
-            ssl_sock.do_handshake()
-        else:
-            # To keep the SSL Context update minimal, only apply forced ssl context to python3.12+
-            force_ssl_context = sys.version_info[0] > 3 or (sys.version_info[0] == 3 and sys.version_info[1] >= 12)
-            if force_ssl_context:
-                ssl_context = ssl.SSLContext(ssl_protocol_version)
-                ssl_context.load_cert_chain(self._cert_path, self._key_path)
-                ssl_context.load_verify_locations(self._ca_path)
-                ssl_context.verify_mode = ssl.CERT_REQUIRED
-
-                ssl_sock = ssl_context.wrap_socket(sock)
-            else:
-                ssl_sock = ssl.wrap_socket(sock,
-                                           certfile=self._cert_path,
-                                           keyfile=self._key_path,
-                                           ca_certs=self._ca_path,
-                                           cert_reqs=ssl.CERT_REQUIRED,
-                                           ssl_version=ssl_protocol_version)
-
-        self._logger.debug("Matching host name...")
-        if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 2):
-            self._tls_match_hostname(ssl_sock)
-        elif sys.version_info[0] == 3 and sys.version_info[1] < 7:
-            # host name verification is handled internally in Python3.7+
-            ssl.match_hostname(ssl_sock.getpeercert(), self._host)
-
-        return ssl_sock
+        pass
 
     def _tls_match_hostname(self, ssl_sock):
-        try:
-            cert = ssl_sock.getpeercert()
-        except AttributeError:
-            # the getpeercert can throw Attribute error: object has no attribute 'peer_certificate'
-            # Don't let that crash the whole client. See also: http://bugs.python.org/issue13721
-            raise ssl.SSLError('Not connected')
-
-        san = cert.get('subjectAltName')
-        if san:
-            have_san_dns = False
-            for (key, value) in san:
-                if key == 'DNS':
-                    have_san_dns = True
-                    if self._host_matches_cert(self._host.lower(), value.lower()) == True:
-                        return
-                if key == 'IP Address':
-                    have_san_dns = True
-                    if value.lower() == self._host.lower():
-                        return
-
-            if have_san_dns:
-                # Only check subject if subjectAltName dns not found.
-                raise ssl.SSLError('Certificate subject does not match remote hostname.')
-        subject = cert.get('subject')
-        if subject:
-            for ((key, value),) in subject:
-                if key == 'commonName':
-                    if self._host_matches_cert(self._host.lower(), value.lower()) == True:
-                        return
-
-        raise ssl.SSLError('Certificate subject does not match remote hostname.')
+        pass
 
     def _host_matches_cert(self, host, cert_host):
-        if cert_host[0:2] == "*.":
-            if cert_host.count("*") != 1:
-                return False
-
-            host_match = host.split(".", 1)[1]
-            cert_match = cert_host.split(".", 1)[1]
-            if host_match == cert_match:
-                return True
-            else:
-                return False
-        else:
-            if host == cert_host:
-                return True
-            else:
-                return False
+        pass
 
     def _send_discovery_request(self, ssl_sock, thing_name):
-        request = self.REQUEST_TYPE_PREFIX + \
-                  self.PAYLOAD_PREFIX + \
-                  thing_name + \
-                  self.PAYLOAD_SUFFIX + \
-                  self.HOST_PREFIX + \
-                  self._host + ":" + str(self._port) + \
-                  self.HOST_SUFFIX
-        self._logger.debug("Sending discover request: " + request)
-
-        start_time = time.time()
-        desired_length_to_write = len(request)
-        actual_length_written = 0
-        while True:
-            try:
-                length_written = ssl_sock.write(request.encode("utf-8"))
-                actual_length_written += length_written
-            except socket.error as err:
-                if err.errno == ssl.SSL_ERROR_WANT_READ or err.errno == ssl.SSL_ERROR_WANT_WRITE:
-                    pass
-            if actual_length_written == desired_length_to_write:
-                return self.LOW_LEVEL_RC_COMPLETE
-            if start_time + self._timeout_sec < time.time():
-                return self.LOW_LEVEL_RC_TIMEOUT
+        pass
 
     def _receive_discovery_response(self, ssl_sock):
-        self._logger.debug("Receiving discover response header...")
-        rc1, response_header = self._receive_until(ssl_sock, self._got_two_crlfs)
-        status_code, body_length = self._handle_discovery_response_header(rc1, response_header.decode("utf-8"))
-
-        self._logger.debug("Receiving discover response body...")
-        rc2, response_body = self._receive_until(ssl_sock, self._got_enough_bytes, body_length)
-        response_body = self._handle_discovery_response_body(rc2, response_body.decode("utf-8"))
-
-        return status_code, response_body
+        pass
 
     def _receive_until(self, ssl_sock, criteria_function, extra_data=None):
-        start_time = time.time()
-        response = bytearray()
-        number_bytes_read = 0
-        ssl_sock_tmp = None
-        while True:  # Python does not have do-while
-            try:
-                ssl_sock_tmp = self._convert_to_int_py3(ssl_sock.read(1))
-                if isinstance(ssl_sock_tmp, list):
-                    response.extend(ssl_sock_tmp)
-                else:
-                    response.append(ssl_sock_tmp)
-                number_bytes_read += 1
-            except socket.error as err:
-                if err.errno == ssl.SSL_ERROR_WANT_READ or err.errno == ssl.SSL_ERROR_WANT_WRITE:
-                    pass
-
-            if criteria_function((number_bytes_read, response, extra_data)):
-                return self.LOW_LEVEL_RC_COMPLETE, response
-            if start_time + self._timeout_sec < time.time():
-                return self.LOW_LEVEL_RC_TIMEOUT, response
+        pass
 
     def _convert_to_int_py3(self, input_char):
-        try:
-            return ord(input_char)
-        except:
-            return input_char
+        pass
 
     def _got_enough_bytes(self, data):
-        number_bytes_read, response, target_length = data
-        return number_bytes_read == int(target_length)
+        pass
 
     def _got_two_crlfs(self, data):
-        number_bytes_read, response, extra_data_unused = data
-        number_of_crlf = 2
-        has_enough_bytes = number_bytes_read > number_of_crlf * 2 - 1
-        if has_enough_bytes:
-            end_of_received = response[number_bytes_read - number_of_crlf * 2 : number_bytes_read]
-            expected_end_of_response = b"\r\n" * number_of_crlf
-            return end_of_received == expected_end_of_response
-        else:
-            return False
+        pass
 
     def _handle_discovery_response_header(self, rc, response):
-        self._raise_on_timeout(rc)
-        http_status_code_matcher = re.compile(self.HTTP_RESPONSE_CODE_PATTERN)
-        http_status_code_matched_groups = http_status_code_matcher.match(response)
-        content_length_matcher = re.compile(self.CONTENT_LENGTH_PATTERN)
-        content_length_matched_groups = content_length_matcher.search(response)
-        return http_status_code_matched_groups.group(1), content_length_matched_groups.group(1)
+        pass
 
     def _handle_discovery_response_body(self, rc, response):
-        self._raise_on_timeout(rc)
-        return response
+        pass
 
     def _raise_on_timeout(self, rc):
-        if rc == self.LOW_LEVEL_RC_TIMEOUT:
-            raise DiscoveryTimeoutException()
+        pass
 
     def _raise_if_not_200(self, status_code, response_body):  # response_body here is str in Py3
-        if status_code != self.HTTP_SC_200:
-            expected_exception = self._expected_exception_map.get(status_code)
-            if expected_exception:
-                raise expected_exception
-            else:
-                raise DiscoveryFailure(response_body)
-        return DiscoveryInfo(response_body)
+        pass

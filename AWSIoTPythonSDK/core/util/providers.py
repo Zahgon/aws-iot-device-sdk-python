@@ -20,10 +20,10 @@ class CredentialsProvider(object):
         self._ca_path = ""
 
     def set_ca_path(self, ca_path):
-        self._ca_path = ca_path
+        pass
 
     def get_ca_path(self):
-        return self._ca_path
+        pass
 
 
 class CertificateCredentialsProvider(CredentialsProvider):
@@ -34,16 +34,16 @@ class CertificateCredentialsProvider(CredentialsProvider):
         self._key_path = ""
 
     def set_cert_path(self,cert_path):
-        self._cert_path = cert_path
+        pass
 
     def set_key_path(self, key_path):
-        self._key_path = key_path
+        pass
 
     def get_cert_path(self):
-        return self._cert_path
+        pass
 
     def get_key_path(self):
-        return self._key_path
+        pass
 
 
 class IAMCredentialsProvider(CredentialsProvider):
@@ -55,22 +55,22 @@ class IAMCredentialsProvider(CredentialsProvider):
         self._aws_session_token = ""
 
     def set_access_key_id(self, access_key_id):
-        self._aws_access_key_id = access_key_id
+        pass
 
     def set_secret_access_key(self, secret_access_key):
-        self._aws_secret_access_key = secret_access_key
+        pass
 
     def set_session_token(self, session_token):
-        self._aws_session_token = session_token
+        pass
 
     def get_access_key_id(self):
-        return self._aws_access_key_id
+        pass
 
     def get_secret_access_key(self):
-        return self._aws_secret_access_key
+        pass
 
     def get_session_token(self):
-        return self._aws_session_token
+        pass
 
 
 class EndpointProvider(object):
@@ -80,23 +80,23 @@ class EndpointProvider(object):
         self._port = -1
 
     def set_host(self, host):
-        self._host = host
+        pass
 
     def set_port(self, port):
-        self._port = port
+        pass
 
     def get_host(self):
-        return self._host
+        pass
 
     def get_port(self):
-        return self._port
+        pass
 
 class CiphersProvider(object):
     def __init__(self):
         self._ciphers = None
 
     def set_ciphers(self, ciphers=None):
-        self._ciphers = ciphers
+        pass
 
     def get_ciphers(self):
-        return self._ciphers
+        pass

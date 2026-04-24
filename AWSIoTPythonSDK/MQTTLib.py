@@ -113,7 +113,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.configure_last_will(topic, payload, QoS, retain)
+        pass
 
     def clearLastWill(self):
         """
@@ -136,7 +136,7 @@ class AWSIoTMQTTClient:
         None
         
         """
-        self._mqtt_core.clear_last_will()
+        pass
 
     def configureEndpoint(self, hostName, portNumber):
         """
@@ -164,12 +164,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        endpoint_provider = EndpointProvider()
-        endpoint_provider.set_host(hostName)
-        endpoint_provider.set_port(portNumber)
-        self._mqtt_core.configure_endpoint(endpoint_provider)
-        if portNumber == 443 and not self._mqtt_core.use_wss():
-            self._mqtt_core.configure_alpn_protocols()
+        pass
 
     def configureIAMCredentials(self, AWSAccessKeyID, AWSSecretAccessKey, AWSSessionToken=""):
         """
@@ -202,11 +197,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        iam_credentials_provider = IAMCredentialsProvider()
-        iam_credentials_provider.set_access_key_id(AWSAccessKeyID)
-        iam_credentials_provider.set_secret_access_key(AWSSecretAccessKey)
-        iam_credentials_provider.set_session_token(AWSSessionToken)
-        self._mqtt_core.configure_iam_credentials(iam_credentials_provider)
+        pass
 
     def configureCredentials(self, CAFilePath, KeyPath="", CertificatePath="", Ciphers=None):  # Should be good for MutualAuth certs config and Websocket rootCA config
         """
@@ -235,15 +226,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        cert_credentials_provider = CertificateCredentialsProvider()
-        cert_credentials_provider.set_ca_path(CAFilePath)
-        cert_credentials_provider.set_key_path(KeyPath)
-        cert_credentials_provider.set_cert_path(CertificatePath)
-
-        cipher_provider = CiphersProvider()
-        cipher_provider.set_ciphers(Ciphers)
-
-        self._mqtt_core.configure_cert_credentials(cert_credentials_provider, cipher_provider)
+        pass
 
     def configureAutoReconnectBackoffTime(self, baseReconnectQuietTimeSecond, maxReconnectQuietTimeSecond, stableConnectionTimeSecond):
         """
@@ -274,7 +257,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.configure_reconnect_back_off(baseReconnectQuietTimeSecond, maxReconnectQuietTimeSecond, stableConnectionTimeSecond)
+        pass
 
     def configureOfflinePublishQueueing(self, queueSize, dropBehavior=DROP_NEWEST):
         """
@@ -307,7 +290,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.configure_offline_requests_queue(queueSize, dropBehavior)
+        pass
 
     def configureDrainingFrequency(self, frequencyInHz):
         """
@@ -337,7 +320,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.configure_draining_interval_sec(1/float(frequencyInHz))
+        pass
 
     def configureConnectDisconnectTimeout(self, timeoutSecond):
         """
@@ -362,7 +345,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.configure_connect_disconnect_timeout_sec(timeoutSecond)
+        pass
 
     def configureMQTTOperationTimeout(self, timeoutSecond):
         """
@@ -387,7 +370,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.configure_operation_timeout_sec(timeoutSecond)
+        pass
 
     def configureUsernamePassword(self, username, password=None):
         """
@@ -413,7 +396,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.configure_username_password(username, password)
+        pass
 
     def configureSocketFactory(self, socket_factory):
         """
@@ -440,7 +423,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.configure_socket_factory(socket_factory)
+        pass
         
     def enableMetricsCollection(self):
         """
@@ -464,7 +447,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.enable_metrics_collection()
+        pass
 
     def disableMetricsCollection(self):
         """
@@ -487,7 +470,7 @@ class AWSIoTMQTTClient:
         None
 
         """
-        self._mqtt_core.disable_metrics_collection()
+        pass
 
     # MQTT functionality APIs
     def connect(self, keepAliveIntervalSecond=600):
@@ -516,8 +499,7 @@ class AWSIoTMQTTClient:
         True if the connect attempt succeeded. False if failed.
 
         """
-        self._load_callbacks()
-        return self._mqtt_core.connect(keepAliveIntervalSecond)
+        pass
 
     def connectAsync(self, keepAliveIntervalSecond=600, ackCallback=None):
         """
@@ -548,13 +530,10 @@ class AWSIoTMQTTClient:
         Connect request packet id, for tracking purpose in the corresponding callback.
 
         """
-        self._load_callbacks()
-        return self._mqtt_core.connect_async(keepAliveIntervalSecond, ackCallback)
+        pass
 
     def _load_callbacks(self):
-        self._mqtt_core.on_online = self.onOnline
-        self._mqtt_core.on_offline = self.onOffline
-        self._mqtt_core.on_message = self.onMessage
+        pass
 
     def disconnect(self):
         """
@@ -577,7 +556,7 @@ class AWSIoTMQTTClient:
         True if the disconnect attempt succeeded. False if failed.
 
         """
-        return self._mqtt_core.disconnect()
+        pass
 
     def disconnectAsync(self, ackCallback=None):
         """
@@ -602,7 +581,7 @@ class AWSIoTMQTTClient:
         Disconnect request packet id, for tracking purpose in the corresponding callback.
 
         """
-        return self._mqtt_core.disconnect_async(ackCallback)
+        pass
 
     def publish(self, topic, payload, QoS):
         """
@@ -632,7 +611,7 @@ class AWSIoTMQTTClient:
         True if the publish request has been sent to paho. False if the request did not reach paho.
 
         """
-        return self._mqtt_core.publish(topic, payload, QoS, False)  # Disable retain for publish by now
+        pass
 
     def publishAsync(self, topic, payload, QoS, ackCallback=None):
         """
@@ -666,7 +645,7 @@ class AWSIoTMQTTClient:
         Publish request packet id, for tracking purpose in the corresponding callback.
 
         """
-        return self._mqtt_core.publish_async(topic, payload, QoS, False, ackCallback)
+        pass
 
     def subscribe(self, topic, QoS, callback):
         """
@@ -700,7 +679,7 @@ class AWSIoTMQTTClient:
         True if the subscribe attempt succeeded. False if failed.
 
         """
-        return self._mqtt_core.subscribe(topic, QoS, callback)
+        pass
 
     def subscribeAsync(self, topic, QoS, ackCallback=None, messageCallback=None):
         """
@@ -738,7 +717,7 @@ class AWSIoTMQTTClient:
         Subscribe request packet id, for tracking purpose in the corresponding callback.
 
         """
-        return self._mqtt_core.subscribe_async(topic, QoS, ackCallback, messageCallback)
+        pass
 
     def unsubscribe(self, topic):
         """
@@ -761,7 +740,7 @@ class AWSIoTMQTTClient:
         True if the unsubscribe attempt succeeded. False if failed.
 
         """
-        return self._mqtt_core.unsubscribe(topic)
+        pass
 
     def unsubscribeAsync(self, topic, ackCallback=None):
         """
@@ -787,7 +766,7 @@ class AWSIoTMQTTClient:
         Unsubscribe request packet id, for tracking purpose in the corresponding callback.
 
         """
-        return self._mqtt_core.unsubscribe_async(topic, ackCallback)
+        pass
 
     def onOnline(self):
         """
@@ -927,8 +906,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        # AWSIoTMQTTClient.configureLastWill(srcTopic, srcPayload, srcQos)
-        self._AWSIoTMQTTClient.configureLastWill(topic, payload, QoS)
+        pass
 
     def clearLastWill(self):
         """
@@ -953,8 +931,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
         
         """
-        # AWSIoTMQTTClient.clearLastWill()
-        self._AWSIoTMQTTClient.clearLastWill()
+        pass
 
     def configureEndpoint(self, hostName, portNumber):
         """
@@ -983,8 +960,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        # AWSIoTMQTTClient.configureEndpoint
-        self._AWSIoTMQTTClient.configureEndpoint(hostName, portNumber)
+        pass
 
     def configureIAMCredentials(self, AWSAccessKeyID, AWSSecretAccessKey, AWSSTSToken=""):
         """
@@ -1019,8 +995,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        # AWSIoTMQTTClient.configureIAMCredentials
-        self._AWSIoTMQTTClient.configureIAMCredentials(AWSAccessKeyID, AWSSecretAccessKey, AWSSTSToken)
+        pass
 
     def configureCredentials(self, CAFilePath, KeyPath="", CertificatePath=""):  # Should be good for MutualAuth and Websocket
         """
@@ -1049,8 +1024,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        # AWSIoTMQTTClient.configureCredentials
-        self._AWSIoTMQTTClient.configureCredentials(CAFilePath, KeyPath, CertificatePath)
+        pass
 
     def configureAutoReconnectBackoffTime(self, baseReconnectQuietTimeSecond, maxReconnectQuietTimeSecond, stableConnectionTimeSecond):
         """
@@ -1083,8 +1057,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        # AWSIoTMQTTClient.configureBackoffTime
-        self._AWSIoTMQTTClient.configureAutoReconnectBackoffTime(baseReconnectQuietTimeSecond, maxReconnectQuietTimeSecond, stableConnectionTimeSecond)
+        pass
 
     def configureConnectDisconnectTimeout(self, timeoutSecond):
         """
@@ -1110,8 +1083,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        # AWSIoTMQTTClient.configureConnectDisconnectTimeout
-        self._AWSIoTMQTTClient.configureConnectDisconnectTimeout(timeoutSecond)
+        pass
 
     def configureMQTTOperationTimeout(self, timeoutSecond):
         """
@@ -1137,8 +1109,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        # AWSIoTMQTTClient.configureMQTTOperationTimeout
-        self._AWSIoTMQTTClient.configureMQTTOperationTimeout(timeoutSecond)
+        pass
 
     def configureUsernamePassword(self, username, password=None):
         """
@@ -1166,7 +1137,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        self._AWSIoTMQTTClient.configureUsernamePassword(username, password)
+        pass
 
     def configureSocketFactory(self, socket_factory):
         """
@@ -1193,7 +1164,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        self._AWSIoTMQTTClient.configureSocketFactory(socket_factory)
+        pass
         
     def enableMetricsCollection(self):
         """
@@ -1219,7 +1190,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        self._AWSIoTMQTTClient.enableMetricsCollection()
+        pass
 
     def disableMetricsCollection(self):
         """
@@ -1243,7 +1214,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         None
 
         """
-        self._AWSIoTMQTTClient.disableMetricsCollection()
+        pass
 
     # Start the MQTT connection
     def connect(self, keepAliveIntervalSecond=600):
@@ -1274,12 +1245,10 @@ class _AWSIoTMQTTDelegatingClient(object):
         True if the connect attempt succeeded. False if failed.
 
         """
-        self._load_callbacks()
-        return self._AWSIoTMQTTClient.connect(keepAliveIntervalSecond)
+        pass
 
     def _load_callbacks(self):
-        self._AWSIoTMQTTClient.onOnline = self.onOnline
-        self._AWSIoTMQTTClient.onOffline = self.onOffline
+        pass
 
     # End the MQTT connection
     def disconnect(self):
@@ -1304,7 +1273,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         True if the disconnect attempt succeeded. False if failed.
 
         """
-        return self._AWSIoTMQTTClient.disconnect()
+        pass
 
     # MQTT connection management API
     def getMQTTConnection(self):
@@ -1335,8 +1304,7 @@ class _AWSIoTMQTTDelegatingClient(object):
         AWSIoTPythonSDK.MQTTLib.AWSIoTMQTTClient object
 
         """
-        # Return the internal AWSIoTMQTTClient instance
-        return self._AWSIoTMQTTClient
+        pass
 
     def onOnline(self):
         """
@@ -1478,8 +1446,7 @@ class AWSIoTMQTTShadowClient(_AWSIoTMQTTDelegatingClient):
         AWSIoTPythonSDK.core.shadow.deviceShadow.deviceShadow object, which exposes the device shadow interface.
 
         """
-        # Create and return a deviceShadow instance
-        return deviceShadow.deviceShadow(shadowName, isPersistentSubscribe, self._shadowManager)
+        pass
         # Shadow APIs are accessible in deviceShadow instance":
         ###
         # deviceShadow.shadowGet
@@ -1592,8 +1559,7 @@ class AWSIoTMQTTThingJobsClient(_AWSIoTMQTTDelegatingClient):
         True if the subscribe attempt succeeded. False if failed.
 
         """
-        topic = self._thingJobManager.getJobTopic(jobExecutionType, jobReplyType, jobId)
-        return self._AWSIoTMQTTClient.subscribe(topic, self._QoS, callback)
+        pass
 
     def createJobSubscriptionAsync(self, ackCallback, callback, jobExecutionType=jobExecutionTopicType.JOB_WILDCARD_TOPIC, jobReplyType=jobExecutionTopicReplyType.JOB_REQUEST_TYPE, jobId=None):
         """
@@ -1640,8 +1606,7 @@ class AWSIoTMQTTThingJobsClient(_AWSIoTMQTTDelegatingClient):
         Subscribe request packet id, for tracking purpose in the corresponding callback.
 
         """
-        topic = self._thingJobManager.getJobTopic(jobExecutionType, jobReplyType, jobId)
-        return self._AWSIoTMQTTClient.subscribeAsync(topic, self._QoS, ackCallback, callback)
+        pass
 
     def sendJobsQuery(self, jobExecTopicType, jobId=None):
         """
@@ -1670,9 +1635,7 @@ class AWSIoTMQTTThingJobsClient(_AWSIoTMQTTDelegatingClient):
         True if the publish request has been sent to paho. False if the request did not reach paho.
 
         """
-        topic = self._thingJobManager.getJobTopic(jobExecTopicType, jobExecutionTopicReplyType.JOB_REQUEST_TYPE, jobId)
-        payload = self._thingJobManager.serializeClientTokenPayload()
-        return self._AWSIoTMQTTClient.publish(topic, payload, self._QoS)
+        pass
 
     def sendJobsStartNext(self, statusDetails=None, stepTimeoutInMinutes=None):
         """
@@ -1699,9 +1662,7 @@ class AWSIoTMQTTThingJobsClient(_AWSIoTMQTTDelegatingClient):
         True if the publish request has been sent to paho. False if the request did not reach paho.
 
         """
-        topic = self._thingJobManager.getJobTopic(jobExecutionTopicType.JOB_START_NEXT_TOPIC, jobExecutionTopicReplyType.JOB_REQUEST_TYPE)
-        payload = self._thingJobManager.serializeStartNextPendingJobExecutionPayload(statusDetails, stepTimeoutInMinutes)
-        return self._AWSIoTMQTTClient.publish(topic, payload, self._QoS)
+        pass
 
     def sendJobsUpdate(self, jobId, status, statusDetails=None, expectedVersion=0, executionNumber=0, includeJobExecutionState=False, includeJobDocument=False, stepTimeoutInMinutes=None):
         """
@@ -1748,9 +1709,7 @@ class AWSIoTMQTTThingJobsClient(_AWSIoTMQTTDelegatingClient):
         True if the publish request has been sent to paho. False if the request did not reach paho.
 
         """
-        topic = self._thingJobManager.getJobTopic(jobExecutionTopicType.JOB_UPDATE_TOPIC, jobExecutionTopicReplyType.JOB_REQUEST_TYPE, jobId)
-        payload = self._thingJobManager.serializeJobExecutionUpdatePayload(status, statusDetails, expectedVersion, executionNumber, includeJobExecutionState, includeJobDocument, stepTimeoutInMinutes)
-        return self._AWSIoTMQTTClient.publish(topic, payload, self._QoS)
+        pass
 
     def sendJobsDescribe(self, jobId, executionNumber=0, includeJobDocument=True):
         """
@@ -1781,6 +1740,4 @@ class AWSIoTMQTTThingJobsClient(_AWSIoTMQTTDelegatingClient):
         True if the publish request has been sent to paho. False if the request did not reach paho.
 
         """
-        topic = self._thingJobManager.getJobTopic(jobExecutionTopicType.JOB_DESCRIBE_TOPIC, jobExecutionTopicReplyType.JOB_REQUEST_TYPE, jobId)
-        payload = self._thingJobManager.serializeDescribeJobExecutionPayload(executionNumber, includeJobDocument)
-        return self._AWSIoTMQTTClient.publish(topic, payload, self._QoS)
+        pass
